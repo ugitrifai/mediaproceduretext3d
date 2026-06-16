@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Pembelajaran Interaktif - Procedure Text</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #2c3e50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Container Utama Pas 916 x 516 Tanpa Scrolling Utama */
+        .main-container {
+            width: 916px;
+            height: 516px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 12px 36px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 3px solid #34495e;
+        }
+
+        /* Header Atas: Identitas Penyusun */
+        .app-header {
+            background: linear-gradient(135deg, #1f3c6d, #2c5282);
+            color: #ffffff;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .header-left h1 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f6ad55;
+            letter-spacing: 0.5px;
+        }
+
+        .header-left p {
+            font-size: 11px;
+            color: #cbd5e0;
+        }
+
+        .header-right {
+            text-align: right;
+            font-size: 11px;
+            line-height: 1.4;
+            color: #edf2f7;
+        }
+
+        /* Menu Navigasi di Bagian Atas Screen Utama */
+        .navbar {
+            background-color: #2d3748;
+            display: flex;
+            border-bottom: 4px solid #f6ad55;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 10px 5px;
+            background: none;
+            border: none;
+            color: #e2e8f0;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            border-right: 1px solid #4a5568;
+        }
+
+        .nav-btn:last-child {
+            border-right: none;
+        }
+
+        .nav-btn:hover {
+            background-color: #4a5568;
+            color: #ffffff;
+        }
+
+        .nav-btn.active {
+            background-color: #f6ad55;
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        /* Layout Utama Split Screen */
+        .workspace {
+            display: flex;
+            flex: 1;
+            height: calc(516px - 95px); /* Menghitung sisa tinggi dari header dan navbar */
+            overflow: hidden;
+        }
+
+        /* Kolom Kiri - Isi Konten / Materi Interaktif (50% Lebar) */
+        .left-column {
+            width: 50%;
+            padding: 14px 18px;
+            overflow-y: auto;
+            background-color: #f7fafc;
+            border-right: 2px solid #e2e8f0;
+        }
+
+        /* Kolom Kanan - Simulasi 3D/AR Statis Selalu Terlihat (50% Lebar) */
+        .right-column {
+            width: 50%;
+            padding: 14px;
+            background-color: #edf2f7;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Tab Content Control */
+        .tab-content {
+            display: none;
+            height: 100%;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Tipografi & Style Teks */
+        h2 {
+            color: #2c5282;
+            font-size: 15px;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 2px solid #cbd5e0;
+        }
+
+        p, li {
+            font-size: 12px;
+            color: #4a5568;
+            line-height: 1.5;
+            margin-bottom: 6px;
+        }
+
+        ul, ol {
+            margin-left: 18px;
+            margin-bottom: 8px;
+        }
+
+        .highlight-box {
+            background-color: #ebf8ff;
+            border-left: 3px solid #3182ce;
+            padding: 6px 10px;
+            margin-top: 6px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Kustomisasi Tampilan Kuis 5 Soal Pilihan Ganda */
+        .quiz-scroll-area {
+            height: calc(100% - 10px);
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .question-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .question-title {
+            font-weight: 600;
+            font-size: 12px;
+            color: #2d3748;
+            margin-bottom: 6px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 5px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: background 0.15s;
+        }
+
+        .option-item:hover {
+            background-color: #edf2f7;
+        }
+
+        .option-item input {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .btn-submit-quiz {
+            background-color: #38a169;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            width: 100%;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 8px;
+        }
+
+        .btn-submit-quiz:hover {
+            background-color: #2f855a;
+        }
+
+        #quiz-feedback {
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        /* Frame Kolom Simulasi 3D / AR (50% Lebar Layar) */
+        .simulasi-header {
+            font-size: 13px;
+            font-weight: 700;
+            color: #2c5282;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .ar-badge {
+            background-color: #3182ce;
+            color: white;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            text-transform: uppercase;
+        }
+
+        .assemblr-embed-box {
+            flex: 1;
+            border: 2px dashed #a0aec0;
+            border-radius: 8px;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            text-align: center;
+            color: #718096;
+            position: relative;
+        }
+
+        .assemblr-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #4a5568;
+        }
+
+        .embed-instructions {
+            font-size: 11px;
+            line-height: 1.4;
+            max-width: 280px;
+        }
+
+        /* Scrollbar Styling Halus */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <!-- IDENTITAS MEDIA -->
+        <div class="app-header">
+            <div class="header-left">
+                <h1>Procedure Text</h1>
+                <p>Mata Pelajaran: Bahasa Inggris | Kelas 11 SMA | Fase F</p>
+            </div>
+            <div class="header-right">
+                <strong>Penyusun:</strong> Mughits Rifai, S.Pd., M.Pd.<br>
+                <span>SMAN 1 Lemahabang</span>
+            </div>
+        </div>
+
+        <!-- MENU NAVIGASI (DI ATAS LAYAR UTAMA) -->
+        <div class="navbar">
+            <button class="nav-btn active" onclick="switchTab(event, 'tujuan-tab')">Tujuan Pembelajaran</button>
+            <button class="nav-btn" onclick="switchTab(event, 'materi-tab')">Materi</button>
+            <button class="nav-btn" onclick="switchTab(event, 'contoh-tab')">Contoh Teks</button>
+            <button class="nav-btn" onclick="switchTab(event, 'kuis-tab')">Kuis</button>
+        </div>
+
+        <!-- AREA KERJA: 50% MATERI - 50% SIMULASI AR -->
+        <div class="workspace">
+            
+            <!-- KOLOM KIRI: MATERI INTERAKTIF (50%) -->
+            <div class="left-column">
+                
+                <!-- Tab: Tujuan Pembelajaran -->
+                <div id="tujuan-tab" class="tab-content active">
+                    <h2>Tujuan Pembelajaran</h2>
+                    <p>Setelah mengikuti pembelajaran menggunakan media interaktif ini, Anda diharapkan mampu:</p>
+                    <ol>
+                        <li>Mengidentifikasi fungsi sosial, struktur teks, dan unsur kebahasaan dari <i>Procedure Text</i> berupa manual teknologi dan tips dengan tepat.</li>
+                        <li>Memahami informasi tersirat dan kontekstual dari langkah-langkah pengoperasian alat elektronik.</li>
+                        <li>Menyusun rancangan teks prosedur sederhana dalam Bahasa Inggris secara urut dan logis.</li>
+                    </ol>
+                    <div class="highlight-box">
+                        <p style="margin: 0; font-weight: 500; color: #2b6cb0;">💡 <b>Petunjuk Penggunaan:</b> Pelajari setiap tab menu berurutan, lalu perhatikan model simulasi visual pendukung di sebelah kanan.</p>
+                    </div>
+                </div>
+
+                <!-- Tab: Materi -->
+                <div id="materi-tab" class="tab-content">
+                    <h2>Materi Pokok: Procedure Text</h2>
+                    <p><b>Definisi:</b> Teks yang menjelaskan atau memandu pembaca tentang cara membuat, mengoperasikan, atau melakukan sesuatu melalui serangkaian langkah terstruktur.</p>
+                    
+                    <p style="font-weight: 600; margin-top: 8px; color: #2c5282;">Struktur Umum (Generic Structure):</p>
+                    <ul>
+                        <li><b>Goal/Aim:</b> Maksud/tujuan utama (biasanya tertera pada judul teks).</li>
+                        <li><b>Materials/Ingredients:</b> Alat, bahan, atau komponen yang diperlukan.</li>
+                        <li><b>Steps/Methods:</b> Urutan kronologis langkah-langkah tindakan nyata.</li>
+                    </ul>
+
+                    <p style="font-weight: 600; margin-top: 8px; color: #2c5282;">Unsur Kebahasaan:</p>
+                    <ul>
+                        <li>Menggunakan <i>Simple Present Tense</i>.</li>
+                        <li>Menggunakan <i>Imperative Sentences</i> (Kalimat perintah, contoh: <i>Connect, Push, Turn on</i>).</li>
+                        <li>Menggunakan <i>Temporal Connectives</i> (Kata hubung waktu, contoh: <i>First, Next, Then, Finally</i>).</li>
+                    </ul>
+                </div>
+
+                <!-- Tab: Contoh Teks -->
+                <div id="contoh-tab" class="tab-content">
+                    <h2>Contoh Teks Prosedur (Manual)</h2>
+                    <p style="background: #edf2f7; padding: 4px 6px; font-weight: 600; border-radius: 4px;">
+                        Title / Goal: How to Connect a Laptop to an External Projector
+                    </p>
+                    <p style="margin-top: 6px;"><b>Materials:</b> A laptop, an LCD projector, and a VGA or HDMI cable.</p>
+                    <p style="font-weight: 600; margin-top: 6px; margin-bottom: 2px;">Steps:</p>
+                    <ol>
+                        <li><b>First</b>, plug the power cable of the projector into a working wall outlet.</li>
+                        <li><b>Second</b>, connect the HDMI or VGA cable to the video port of your laptop.</li>
+                        <li><b>Then</b>, plug the other end of the cable into the corresponding input port on the projector.</li>
+                        <li><b>Next</b>, turn on the projector by pressing the power button and wait for it to warm up.</li>
+                        <li><b>After that</b>, turn on your laptop and press the projection shortcut key (usually <code>Fn + F4</code> or <code>Win + P</code>).</li>
+                        <li><b>Finally</b>, choose the "Duplicate" or "Extend" mode to project your screen properly.</li>
+                    </ol>
+                </div>
+
+                <!-- Tab: Kuis (5 Soal Pilihan Ganda) -->
+                <div id="kuis-tab" class="tab-content">
+                    <div class="quiz-scroll-area">
+                        <h2>Kuis Evaluasi</h2>
+                        
+                        <!-- Soal 1 -->
+                        <div class="question-card">
+                            <p class="question-title">1. What is the main social function of a procedure text?</p>
+                            <div class="options-list">
+                                <label class="option-item"><input type="radio" name="soal1" value="A"> A. To report a past event to the public</label>
+                                <label class="option-item"><input type="radio" name="soal1" value="B"> B. To describe a specific person or place in detail</label>
+                                <label class="option-item"><input type="radio" name="soal1" value="C"> C. To guide the reader on how to do or make something through steps</label>
+                                <label class="option-item"><input type="radio" name="soal1" value="D"> D. To entertain the readers with an imaginative story</label>
+                                <label class="option-item"><input type="radio" name="soal1" value="E"> E. To persuade people that something is the case</label>
+                            </div>
+                        </div>
+
+                        <!-- Soal 2 -->
+                        <div class="question-card">
+                            <p class="question-title">2. Which part of the structural system indicates the title or target outcome?</p>
+                            <div class="options-list">
+                                <label class="option-item"><input type="radio" name="soal2" value="A"> A. Steps</label>
+                                <label class="opt-label option-item"><input type="radio" name="soal2" value="B"> B. Materials</label>
+                                <label class="option-item"><input type="radio" name="soal2" value="C"> C. Orientation</label>
+                                <label class="option-item"><input type="radio" name="soal2" value="D"> D. Reorientation</label>
+                                <label class="option-item"><input type="radio" name="soal2" value="E"> E. Goal</label>
+                            </div>
+                        </div>
+
+                        <!-- Soal 3 -->
+                        <div class="question-card">
+                            <p class="question-title">3. Look at the sentence: "Plug the power adapter into the wall outlet." What kind of expression is this?</p>
+                            <div class="options-list">
+                                <label class="option-item"><input type="radio" name="soal3" value="A"> A. Interrogative sentence</label>
+                                <label class="option-item"><input type="radio" name="soal3" value="B"> B. Imperative sentence</label>
+                                <label class="option-item"><input type="radio" name="soal3" value="C"> C. Declarative sentence</label>
+                                <label class="option-item"><input type="radio" name="soal3" value="D"> D. Past statement</label>
+                                <label class="option-item"><input type="radio" name="soal3" value="E"> E. Passive voice</label>
+                            </div>
+                        </div>
+
+                        <!-- Soal 4 -->
+                        <div class="question-card">
+                            <p class="question-title">4. Words like "First", "Second", "Then", and "Finally" are grammatically known as...</p>
+                            <div class="options-list">
+                                <label class="option-item"><input type="radio" name="soal4" value="A"> A. Nouns</label>
+                                <label class="option-item"><input type="radio" name="soal4" value="B"> B. Descriptive Adjectives</label>
+                                <label class="option-item"><input type="radio" name="soal4" value="C"> C. Temporal Connectives / Sequence Adverbs</label>
+                                <label class="option-item"><input type="radio" name="soal4" value="D"> D. Modal Auxiliaries</label>
+                                <label class="option-item"><input type="radio" name="soal4" value="E"> E. Relative Pronouns</label>
+                            </div>
+                        </div>
+
+                        <!-- Soal 5 -->
+                        <div class="question-card">
+                            <p class="question-title">5. Which of the following verbs is an example of an "action verb" commonly found in manual texts?</p>
+                            <div class="options-list">
+                                <label class="option-item"><input type="radio" name="soal5" value="A"> A. Think</label>
+                                <label class="option-item"><input type="radio" name="soal5" value="B"> B. Believe</label>
+                                <label class="option-item"><input type="radio" name="soal5" value="C"> C. Press</label>
+                                <label class="option-item"><input type="radio" name="soal5" value="D"> D. Know</label>
+                                <label class="option-item"><input type="radio" name="soal5" value="E"> E. Understand</label>
+                            </div>
+                        </div>
+
+                        <button class="btn-submit-quiz" onclick="checkQuizScore()">Kirim Jawaban & Periksa Nilai</button>
+                        <div id="quiz-feedback"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- KOLOM KANAN: SIMULASI 3D / AR (SELALU TERLIHAT - TEPAT 50% LEBAR) -->
+            <div class="right-column">
+                <div class="simulasi-header">
+                    <span>Simulasi 3D / AR Perangkat</span>
+                    <span class="ar-badge">Assemblr Edu</span>
+                </div>
+                <div class="assemblr-embed-box">
+                    <iframe src="https://viewer.assemblrworld.com/Viewer/-C2mlTufb5R7KtKlyKA8" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <!-- Saat ingin melakukan embed asli, hilangkan teks instruksi di atas dan aktifkan contoh tag di bawah ini: -->
+                    <!-- <iframe src="https://assemblrworld.com/embed/XXXXXX" width="100%" height="100%" frameborder="0" allowfullscreen></iframe> -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SCRIPT INTERAKTIF JAVASCRIPT -->
+    <script>
+        // Navigasi Tab Menu Atas
+        function switchTab(event, tabId) {
+            var i, tabContent, navButtons;
+            
+            tabContent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabContent.length; i++) {
+                tabContent[i].classList.remove("active");
+            }
+            
+            navButtons = document.getElementsByClassName("nav-btn");
+            for (i = 0; i < navButtons.length; i++) {
+                navButtons[i].classList.remove("active");
+            }
+            
+            document.getElementById(tabId).classList.add("active");
+            event.currentTarget.classList.add("active");
+        }
+
+        // Kalkulasi Skor Otomatis Kuis 5 Soal
+        function checkQuizScore() {
+            // Kunci Jawaban Benar
+            var correctAnswers = {
+                soal1: "C",
+                soal2: "E",
+                soal3: "B",
+                soal4: "C",
+                soal5: "C"
+            };
+            
+            var score = 0;
+            var totalQuestions = 5;
+            var answeredCount = 0;
+            
+            for (var key in correctAnswers) {
+                var selectedOption = document.querySelector('input[name="' + key + '"]:checked');
+                if (selectedOption) {
+                    answeredCount++;
+                    if (selectedOption.value === correctAnswers[key]) {
+                        score++;
+                    }
+                }
+            }
+            
+            var feedbackBox = document.getElementById("quiz-feedback");
+            
+            if (answeredCount < totalQuestions) {
+                feedbackBox.innerHTML = "Peringatan: Harap jawab semua 5 soal terlebih dahulu!";
+                feedbackBox.style.backgroundColor = "#fff5f5";
+                feedbackBox.style.color = "#c53030";
+                return;
+            }
+            
+            var finalPercentage = (score / totalQuestions) * 100;
+            
+            feedbackBox.innerHTML = "Skor Akhir Anda: " + finalPercentage + "% (" + score + " dari " + totalQuestions + " Benar)";
+            
+            if (finalPercentage >= 70) {
+                feedbackBox.style.backgroundColor = "#f0fff4";
+                feedbackBox.style.color = "#22543d";
+            } else {
+                feedbackBox.style.backgroundColor = "#fff5f5";
+                feedbackBox.style.color = "#9b2c2c";
+            }
+        }
+    </script>
+</body>
+</html>
